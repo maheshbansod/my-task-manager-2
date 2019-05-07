@@ -7,29 +7,26 @@ import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 
 public class ImageButton extends JButton {
-	Color color;
+//	Color color;
 	BufferedImage image;
 
 	ImageButton() {
 		super();
 		initButton();
-		this.color = new Color(0,0,0,0);
+//		this.color = new Color(0,0,0,0);
 		//enableInputMethods(true);
 		//addMouseListener(this);
 	}
 
-	ImageButton(String imagestr, Color color) {
+	ImageButton(String imagestr) {
 		super();
-		//enableInputMethods(true);
-		//addMouseListener(this);
 		initButton();
 		try {
-			BufferedImage image = ImageIO.read(new File("editbutton.png"));
+			BufferedImage image = ImageIO.read(new File(imagestr));
+			setIcon(new ImageIcon(image));
 		} catch(Exception e) {
-			System.out.println("Couldn't load image edit button");
+			System.out.println("Couldn't load image for the button");
 		}
-
-		this.color = color;
 	}
 
 	private void initButton() {
@@ -43,14 +40,4 @@ public class ImageButton extends JButton {
 	public Dimension getPreferredSize() {
 		return new Dimension(50,50);
 	}
-
-	public void paintComponent(Graphics g) {
-		Graphics2D g2 = (Graphics2D)g;
-
-		g2.setPaint(color);
-
-		g2.fill(new Ellipse2D.Double(0,0,getSize().width, getSize().width));
-		g2.drawImage(image, 0,0,getSize().width, getSize().width, null);
-	}
-
 }
