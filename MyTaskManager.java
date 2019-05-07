@@ -1,8 +1,16 @@
 
 import java.awt.*;
+import java.awt.event.*;
 import javax.swing.*;
+import java.util.ArrayList;
+import java.io.*;
 
 public class MyTaskManager extends JFrame {
+
+	Card aCard, bCard, cCard, dCard;
+
+	final String filename = "taskfile.dat";
+
 	MyTaskManager() {
 
 		setLayout(new GridLayout(2,2));
@@ -18,37 +26,51 @@ public class MyTaskManager extends JFrame {
 		bPanel.setBackground(Color.YELLOW);
 		cPanel.setBackground(Color.BLUE);
 		dPanel.setBackground(Color.GREEN);*/
-		Card aCard = new Card("Urgent",Color.RED);
-		Card bCard = new Card("Important not urgent",Color.YELLOW);
-		Card cCard = new Card("Not urgent not Important",Color.BLUE);
-		Card dCard = new Card("Urgent not important",Color.GREEN);
+		aCard = new Card(this, "Urgent",Color.RED);
+		bCard = new Card(this, "Important not urgent",Color.YELLOW);
+		cCard = new Card(this, "Not urgent not Important",Color.BLUE);
+		dCard = new Card(this, "Urgent not important",Color.GREEN);
 
-	/*	c.fill = GridBagConstraints.BOTH;
-		//c.anchor = GridBagConstraints.FIRST_LINE_START;
-		c.weightx = c.weighty = 1;
-
-		c.gridx = 0;
-		c.gridy = 0;
-		add(aCard, c);
-		c.gridx = 1;
-		c.gridy = 0;
-		add(bCard, c);
-		c.gridx = 0;
-		c.gridy = 1;
-		add(cCard, c);
-		c.gridx = 1;
-		c.gridy = 1;
-		add(dCard, c);*/
 		add(aCard);
 		add(bCard);
 		add(cCard);
 		add(dCard);
 
+		addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent we) {
+				try {
+//					writeToFile(filename);
+;
+				} catch(Exception e) {
+					JOptionPane.showMessageDialog(MyTaskManager.this, "Exception occured while writing to file.","Problem while saving the tasks", JOptionPane.ERROR_MESSAGE);
+					e.printStackTrace();
+				}
+				MyTaskManager.this.dispose();
+			}
+		});
+
 		setExtendedState(JFrame.MAXIMIZED_BOTH);
 		setUndecorated(true);
 		setVisible(true);
 
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	}
+
+	void writeToFile(String filename) throws Exception {
+		ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filename));
+		out.writeObject("A");
+		aCard.writeToFile(out);
+
+		out.writeObject("B");
+		bCard.writeToFile(out);
+
+		out.writeObject("C");
+		cCard.writeToFile(out);
+
+		out.writeObject("D");
+		dCard.writeToFile(out);
+		
+		out.close();
 	}
 
 	public static void main(String args[]) {

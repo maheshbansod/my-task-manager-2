@@ -1,9 +1,11 @@
 
 import java.awt.*;
 import java.awt.event.*;
+import java.beans.*; //for property change listener
 import javax.swing.*;
 import javax.imageio.ImageIO;
 import java.io.File;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 
 public class Card extends JPanel {
@@ -13,6 +15,8 @@ public class Card extends JPanel {
 
 	JPanel listpanel;
 	GridBagConstraints lp_c;
+
+	JFrame frame;
 
 	private int gy = 0;
 
@@ -27,7 +31,8 @@ public class Card extends JPanel {
 		return new Color(r,g,b);
 	}
 
-	public Card(String title, Color color) {
+	public Card(JFrame frame, String title, Color color) {
+		this.frame = frame;
 		tasks = new ArrayList<ListItem>();
 
 		setLayout(new GridBagLayout());
@@ -51,7 +56,7 @@ public class Card extends JPanel {
 		add(headPanel, c);
 		JScrollPane contentPanel = new JScrollPane();//JPanel(new FlowLayout(FlowLayout.LEFT));
 		contentPanel.setOpaque(false);
-//		contentPanel.setBackground(Color.black);
+		contentPanel.setBackground(color);
 		c.fill = GridBagConstraints.BOTH;
 		c.gridx = 0;
 		c.weighty = 1;
@@ -64,12 +69,6 @@ public class Card extends JPanel {
 			System.out.println("Couldn't load editbutton");
 		}*/
 		addbtn = new ImageButton("plus.png");
-//		addbtn.setSize(50,50);
-//		addbtn.setOpaque(false);
-//		addbtn.setFocusPainted(false);
-//		addbtn.setBorderPainted(false);
-//		addbtn.setContentAreaFilled(false);
-//		addbtn.setBorder(BorderFactory.createEmptyBorder(0,0,0,0));
 		addbtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
 				addItem();
@@ -79,6 +78,7 @@ public class Card extends JPanel {
 		headPanel.add(addbtn, BorderLayout.EAST);
 
 		listpanel = new JPanel(new GridBagLayout());
+		listpanel.setOpaque(false);
 		lp_c = new GridBagConstraints();
 		lp_c.gridx = 0;
 		lp_c.gridy = gy++;
@@ -86,36 +86,27 @@ public class Card extends JPanel {
 		lp_c.weighty = 0;
 		lp_c.fill = GridBagConstraints.HORIZONTAL;
 		lp_c.anchor = GridBagConstraints.FIRST_LINE_START;
-		//listpanel.add(new JLabel("abc"),lp_c);
 		for(int i=0;i<tasks.size();i++) {
 			//additemfunction
-			//JLabel task = new JLabel(tasks.get(i));
 			listpanel.add(tasks.get(i), lp_c);
 			lp_c.gridy=gy++;
 		}
 
-/*		c = new GridBagConstraints();
-		c.gridx = c.gridy = 0;
-		c.fill = GridBagConstraints.BOTH;
-		c.weightx = c.weighty = 1;
-		c.anchor = GridBagConstraints.FIRST_LINE_START;*/
-
-		//JScrollPane scrollpane = new JScrollPane(listpanel);
-		//scrollpane.setPreferredSize(new Dimension(500,500));
 		contentPanel.setViewportView(listpanel);
 	}
 
 	public void addItem() {
 		String str = (String)JOptionPane.showInputDialog(this, "Enter task: ", "New task", JOptionPane.PLAIN_MESSAGE);
+		
+		if(str == null) return;
 
-		ListItem task = new ListItem(str);
+		ListItem task = new ListItem(this, str);
+//		task.addPropertyChangeListener(this);
 
 		tasks.add(task);
 
-		/*JLabel task = new JLabel(str);S*/
-		//task.setBorder(BorderFactory.createLineBorder(Color.black));
 		task.setOpaque(false);
-		listpanel.add(task, lp_c);
+/*		listpanel.add(task, lp_c);
 		lp_c.gridy=gy++;
 		listpanel.revalidate();
 
@@ -123,5 +114,56 @@ public class Card extends JPanel {
 			System.out.print(tasks.get(i)+",");
 		}
 		System.out.println();*/
+		reAddAll();
+	}
+
+	private void reAddAll() {
+		listpanel.removeAll();
+		GridBagConstraints c = new GridBagConstraints();
+
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 0;
+		c.weightx = 1.0;
+		c.gridy = 0;
+
+		for(ListItem li : tasks) {
+			listpanel.add(li, c);
+			c.gridy+=1;
+		}
+		listpanel.revalidate();
+		frame.revalidate();
+	}
+
+	public void removeItem(ListItem item) {
+		tasks.remove(item);
+
+		reAddAll();
+	}
+
+/*	public void propertyChange(PropertyChangeEvent evt) {
+		String propName = evt.getPropertyName();
+		if(propName.equals("delete")) {
+			System.out.println("delete action fired");
+		}
+	}*/
+	
+	public void writeToFile(ObjectOutputStream out) throws Exception {
+		out.write(getListSize());
+		for(ListItem l : tasks) {
+			out.writeObject(l.getText());
+		}
+	}
+
+	public int getListSize() {
+		return tasks.size();
+	}
+
+	public ArrayList<String> getList() {
+		ArrayList<String> list = new ArrayList<String>();
+
+		for(ListItem l: tasks) {
+			list.add(l.getText());
+		}
+		return list;
 	}
 }
