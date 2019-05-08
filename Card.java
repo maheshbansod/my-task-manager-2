@@ -4,8 +4,7 @@ import java.awt.event.*;
 import java.beans.*; //for property change listener
 import javax.swing.*;
 import javax.imageio.ImageIO;
-import java.io.File;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.util.ArrayList;
 
 public class Card extends JPanel {
@@ -46,16 +45,15 @@ public class Card extends JPanel {
 
 		JPanel headPanel = new JPanel(new BorderLayout());
 		headPanel.setBackground(brighterColor(color));
-		//headPanel.setBackground(Color.GREEN);
 		headPanel.setBorder(BorderFactory.createMatteBorder(0,0,1,0,Color.GRAY));
-		//headPanel.setOpaque(false);
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.anchor = GridBagConstraints.PAGE_START;
 		c.gridx = 0;
 		c.gridy = 0;
 		add(headPanel, c);
-		JScrollPane contentPanel = new JScrollPane();//JPanel(new FlowLayout(FlowLayout.LEFT));
+		JScrollPane contentPanel = new JScrollPane();
 		contentPanel.setOpaque(false);
+		contentPanel.getViewport().setOpaque(false);
 		contentPanel.setBackground(color);
 		c.fill = GridBagConstraints.BOTH;
 		c.gridx = 0;
@@ -63,11 +61,6 @@ public class Card extends JPanel {
 		c.gridy = 1;
 		add(contentPanel, c);
 
-		/*try {
-			//addbtn = new JButton(new ImageIcon(ImageIO.read(new File("plus.png"))));
-		} catch(Exception e) {
-			System.out.println("Couldn't load editbutton");
-		}*/
 		addbtn = new ImageButton("plus.png");
 		addbtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
@@ -82,7 +75,6 @@ public class Card extends JPanel {
 		lp_c = new GridBagConstraints();
 		lp_c.gridx = 0;
 		lp_c.gridy = gy++;
-		lp_c.weighty = 1;
 		lp_c.weighty = 0;
 		lp_c.fill = GridBagConstraints.HORIZONTAL;
 		lp_c.anchor = GridBagConstraints.FIRST_LINE_START;
@@ -101,19 +93,9 @@ public class Card extends JPanel {
 		if(str == null) return;
 
 		ListItem task = new ListItem(this, str);
-//		task.addPropertyChangeListener(this);
 
 		tasks.add(task);
 
-		task.setOpaque(false);
-/*		listpanel.add(task, lp_c);
-		lp_c.gridy=gy++;
-		listpanel.revalidate();
-
-		/*for(int i=0;i<tasks.size();i++) {
-			System.out.print(tasks.get(i)+",");
-		}
-		System.out.println();*/
 		reAddAll();
 	}
 
@@ -131,7 +113,7 @@ public class Card extends JPanel {
 			c.gridy+=1;
 		}
 		listpanel.revalidate();
-		frame.revalidate();
+		this.repaint();
 	}
 
 	public void removeItem(ListItem item) {
@@ -152,6 +134,19 @@ public class Card extends JPanel {
 		for(ListItem l : tasks) {
 			out.writeObject(l.getText());
 		}
+	}
+
+	public void readFromFile(ObjectInputStream in) throws Exception {
+		try {
+			int n = in.read();
+			for(int i=0;i<n;i++) {
+				ListItem l = new ListItem(this, (String)in.readObject());
+				tasks.add(l);
+			}
+		} catch(EOFException e) {
+			System.out.println("File is corrupt it seems.");
+		}
+		reAddAll();
 	}
 
 	public int getListSize() {

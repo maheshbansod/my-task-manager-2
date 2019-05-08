@@ -14,9 +14,11 @@ public class ListItem extends JPanel {
 		donebtn = new ImageButton("greentick.png");
 		deletebtn = new ImageButton("redx.png");
 
+		setOpaque(false);
 		setLayout(new BorderLayout());
 		add(label, BorderLayout.CENTER);
 		JPanel panel = new JPanel();
+		panel.setOpaque(false);
 		panel.add(donebtn);
 		panel.add(deletebtn);
 		add(panel, BorderLayout.EAST);
@@ -24,7 +26,6 @@ public class ListItem extends JPanel {
 		donebtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
 				JOptionPane.showMessageDialog(null, "Great!");
-//				firePropertyChange("delete", null, this);
 				parent.removeItem(ListItem.this);
 			}
 		});
