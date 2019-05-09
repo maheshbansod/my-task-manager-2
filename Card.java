@@ -34,6 +34,8 @@ public class Card extends JPanel {
 		this.frame = frame;
 		tasks = new ArrayList<ListItem>();
 
+		title = "<html><h1>"+title+"</h1></html>";
+
 		setLayout(new GridBagLayout());
 		setBackground(color);
 		titlelabel = new JLabel(title);
@@ -62,6 +64,8 @@ public class Card extends JPanel {
 		add(contentPanel, c);
 
 		addbtn = new ImageButton("plus.png");
+		addbtn.setOpaque(true);
+		addbtn.setBackground(new Color(100,100,0));
 		addbtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
 				addItem();
@@ -122,13 +126,7 @@ public class Card extends JPanel {
 		reAddAll();
 	}
 
-/*	public void propertyChange(PropertyChangeEvent evt) {
-		String propName = evt.getPropertyName();
-		if(propName.equals("delete")) {
-			System.out.println("delete action fired");
-		}
-	}*/
-	
+
 	public void writeToFile(ObjectOutputStream out) throws Exception {
 		out.write(getListSize());
 		for(ListItem l : tasks) {

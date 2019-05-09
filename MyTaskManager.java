@@ -14,28 +14,17 @@ public class MyTaskManager extends JFrame {
 	MyTaskManager() {
 
 		setLayout(new GridLayout(2,2));
+		setTitle("My Task Manager 2");
+		setIconImage((new ImageIcon("icon.png")).getImage());
 
 		GridBagConstraints c = new GridBagConstraints();
 
-		/*JPanel aPanel = new JPanel();
-		JPanel bPanel = new JPanel();
-		JPanel cPanel = new JPanel();
-		JPanel dPanel = new JPanel();
-
-		aPanel.setBackground(Color.RED);
-		bPanel.setBackground(Color.YELLOW);
-		cPanel.setBackground(Color.BLUE);
-		dPanel.setBackground(Color.GREEN);*/
 		aCard = new Card(this, "Urgent and important",Color.RED);
-		bCard = new Card(this, "Important not urgent",Color.YELLOW);
-		cCard = new Card(this, "Not urgent not Important",Color.BLUE);
-		dCard = new Card(this, "Urgent not important",Color.GREEN);
+		bCard = new Card(this, "Important not urgent",Color.GREEN);
+		cCard = new Card(this, "Not urgent not Important", new Color(100,100,255));
+		dCard = new Card(this, "Urgent not important",new Color(0,100,0));
 
-		try {
-			readFromFile(filename);
-		} catch(Exception e) {
-			JOptionPane.showMessageDialog(this, "Exception occured while reading from file", "Problem while reading the tasks", JOptionPane.ERROR_MESSAGE);
-		}
+		
 
 		add(aCard);
 		add(bCard);
@@ -58,7 +47,14 @@ public class MyTaskManager extends JFrame {
 		setExtendedState(JFrame.MAXIMIZED_BOTH);
 		setUndecorated(true);
 		setVisible(true);
-
+		try {
+			readFromFile(filename);
+		} catch(FileNotFoundException e) {
+			System.out.println("error while opening file");
+			JOptionPane.showMessageDialog(this, "File not found. New file will be created");
+		} catch(Exception e) {
+			JOptionPane.showMessageDialog(this, "Exception occured while reading from file", "Problem while reading the tasks", JOptionPane.ERROR_MESSAGE);
+		}
 	}
 
 	void writeToFile(String filename) throws Exception {
@@ -81,6 +77,7 @@ public class MyTaskManager extends JFrame {
 	void readFromFile(String filename) throws Exception {
 		ObjectInputStream in = new ObjectInputStream(new FileInputStream(filename));
 
+
 		try {
 			String c;
 			boolean close = false;
@@ -101,8 +98,7 @@ public class MyTaskManager extends JFrame {
 			}
 		} catch(EOFException e) {
 		}
-
-		in.close();
+			in.close();
 	}
 
 	public static void main(String args[]) {
